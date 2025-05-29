@@ -20,27 +20,6 @@ Maven – No es obligatorio instalar Maven manualmente, ya que el proyecto inclu
 
 Además, se recomienda contar con una herramienta cliente SQL (por ejemplo SQL*Plus, SQL Developer o similar) para crear el usuario de base de datos y verificar las tablas, y un navegador web moderno para acceder a la aplicación frontend.
 
-Estructura del repositorio
-
-El repositorio está organizado en dos directorios principales, uno para el backend y otro para el frontend, junto con archivos de configuración y el presente README:
-
-biblioteca-prueba/
-├── backend/               # Proyecto Spring Boot (Java + Maven)
-│   ├── mvnw, mvnw.cmd     # Maven Wrapper para ejecutar Maven sin instalarlo
-│   ├── pom.xml            # Archivo de configuración de Maven (dependencias, plugins)
-│   └── src/               # Código fuente del backend (Java + recursos)
-│       ├── main/
-│       │   ├── java/      # Código fuente Java (controladores, servicios, mappers MyBatis, etc.)
-│       │   └── resources/ # Recursos (application.properties, scripts de Flyway, mappers XML de MyBatis)
-│       │       └── db/migration/  # Scripts SQL de migración de base de datos (Flyway)
-│
-├── frontend/              # Proyecto Angular (cliente web)
-│   ├── angular.json       # Configuración del proyecto Angular CLI
-│   ├── package.json       # Dependencias y scripts del proyecto frontend
-│   └── src/               # Código fuente del frontend (componentes, servicios, vistas, estilos)
-│       └── app/           # Componentes principales de la aplicación Angular
-└── README.md              # Documentación del proyecto (este archivo)
-
 Nota: Dentro de backend/src/main/resources se encuentra el archivo application.properties, que contiene la configuración de conexión a la base de datos (URL, usuario, contraseña) y otras propiedades de la aplicación. Asegúrese de revisar este archivo si necesita cambiar la configuración por defecto (por ejemplo, credenciales de base de datos o puerto del servidor).
 
 Instrucciones de instalación y ejecución
