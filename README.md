@@ -28,7 +28,8 @@ A continuación se detallan los pasos para poner en marcha el sistema biblioteca
 
 Clonar el repositorio:
 Clone este repositorio en su máquina local usando Git. En una terminal, ejecute:
-git clone https://github.com/usuario/biblioteca-prueba.git
+https://github.com/AinzB/biblioteca-prueba.git
+
 Esto creará una carpeta biblioteca-prueba/ con el contenido del proyecto. Luego, ingrese a la carpeta del proyecto:
 cd biblioteca-prueba
 
