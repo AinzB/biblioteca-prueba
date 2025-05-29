@@ -1,0 +1,217 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+    <div class="mb-2 mb-md-0 appHeaderTitle">
+        <h2 class="mb-0">Gestión de Inventario</h2>
+        <p class="mb-0">{{ copiaLibros.length }} libros encontrados</p>
+    </div>
+
+    <div class="input-group w-100 w-md-auto" style="max-width: 20rem">
+        <input type="text" class="form-control" placeholder="Buscar libro por titulo..." aria-label="Buscar libro"
+            [(ngModel)]="nameSearchFilter" (keyup.enter)="getByName()" />
+        <span class="input-group-text" role="button" (click)="getByName()">
+            <i class="bi bi-search"></i>
+        </span>
+    </div>
+</div>
+
+<div class="table-responsive contentTable">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Acciones</th>
+                <th scope="col">Imagen</th>
+                <th scope="col">Título</th>
+                <th scope="col">Autor</th>
+                <th scope="col">Editorial</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Condición</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let copy of copiaLibros">
+                <!-- Acciones -->
+                <td>
+                    <button *ngIf="copy.status === 'DISPONIBLE'; else viewOnly" class="btn btn-sm btn-success"
+                        (click)="onLoan(copy)" title="Prestar" data-bs-toggle="modal" data-bs-target="#newModal">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </button>
+                    <ng-template #viewOnly>
+                        <button class="btn btn-sm btn-secondary" title="Ver detalle" data-bs-toggle="modal"
+                            data-bs-target="#bookDetailModal" (click)="onDetailCopyLoan(copy)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </ng-template>
+                </td>
+
+                <!-- Imagen -->
+                <td style="width: 4rem">
+                    <img [src]="copy.bookImageUrl" alt="Portada" class="img-fluid rounded"
+                        style="max-height: 3rem; object-fit: cover" />
+                </td>
+
+                <!-- Título -->
+                <td>{{ copy.bookTitle }}</td>
+
+                <!-- Autor -->
+                <td>{{ copy.authorName }}</td>
+
+                <!-- Editorial -->
+                <td>{{ copy.publisherName }}</td>
+
+                <!-- Estado -->
+                <td>
+                    <span class="badge" [ngClass]="{
+              'bg-success': copy.status === 'DISPONIBLE',
+              'bg-warning': copy.status === 'PRESTADO',
+              'bg-danger': copy.status === 'PERDIDO'
+            }">
+                        {{ copy.status }}
+                    </span>
+                </td>
+
+                <!-- Condición -->
+                <td>
+                    <span class="badge" [ngClass]="{
+              'bg-primary': copy.condition === 'EXCELENTE',
+              'bg-info': copy.condition === 'BUENA',
+              'bg-secondary': copy.condition === 'MALA'
+            }">
+                        {{ copy.condition }}
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newModalLabel">Registrar Préstamo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form #loanForm="ngForm">
+                    <div class="mb-3">
+                        <label for="bookTitle" class="form-label">Título del Libro</label>
+                        <input type="text" id="bookTitle" name="bookTitle" class="form-control"
+                            [(ngModel)]="nuevoPrestamo.bookTitle" disabled />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="bookPublisher" class="form-label">Editorial</label>
+                            <input type="text" id="bookPublisher" name="bookPublisher" class="form-control"
+                                [(ngModel)]="nuevoPrestamo.publisherName" disabled />
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="bookAuthor" class="form-label">Autor</label>
+                            <input type="text" id="bookAuthor" name="bookAuthor" class="form-control"
+                                [(ngModel)]="nuevoPrestamo.authorName" disabled />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="studentSelect" class="form-label">Estudiante</label>
+                        <select id="studentSelect" name="studentId" class="form-select" required
+                            [(ngModel)]="nuevoPrestamo.studentId" #student="ngModel">
+                            <option value="" disabled selected>Selecciona un estudiante</option>
+                            <option *ngFor="let est of estudiantes" [value]="est.id">
+                                {{ est.firstName }} {{ est.lastName }} ({{ est.studentCode }})
+                            </option>
+                        </select>
+                        <div class="text-danger" *ngIf="student.invalid && student.touched">
+                            Debes seleccionar un estudiante.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="loanDate" class="form-label">Fecha del Préstamo</label>
+                            <input type="date" id="loanDate" name="loanDate" class="form-control" [ngModel]="today"
+                                disabled />
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="pickupDate" class="form-label">Fecha de Recogida</label>
+                            <input type="date" id="pickupDate" name="pickupDate" class="form-control" required
+                                [(ngModel)]="nuevoPrestamo.dueDate" #pickup="ngModel" />
+                            <div class="text-danger" *ngIf="pickup.invalid && pickup.touched">
+                                Ingresa la fecha de recogida.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="returnDate" class="form-label">Fecha de Retorno</label>
+                        <input type="date" id="returnDate" name="returnDate" class="form-control" required
+                            [(ngModel)]="nuevoPrestamo.returnDate" #ret="ngModel" />
+                        <div class="text-danger" *ngIf="ret.invalid && ret.touched">
+                            Ingresa la fecha de retorno.
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="preSave()" data-bs-dismiss="modal">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookDetailLabel">Detalle del préstamo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
+                    (click)="limCamp()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 col-md-5 d-flex justify-content-center mb-3 mb-md-0">
+                            <img src="{{ nuevoPrestamo.bookImageUrl }}" alt="Portada vertical" class="img-fluid"
+                                style="max-height: 400px; object-fit: cover;">
+                        </div>
+
+                        <div class="col-12 col-md-7">
+                            <h3 class="mt-0">{{ nuevoPrestamo.bookTitle }}</h3>
+                            <p class="mb-1"><strong>Autor:</strong> {{ nuevoPrestamo.authorName }}</p>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;"><strong>Editorial:</strong> {{
+                                nuevoPrestamo.publisherName }}</p>
+                            <p class="mb-1"><strong>Prestado a:</strong> {{ nuevoPrestamo.studentName }}</p>
+
+                            <p class="mb-1"><strong>Fecha del prestamo:</strong> {{ nuevoPrestamo.loanDate }}</p>
+                            <p class="mb-1"><strong>Fecha recogido:</strong> {{ nuevoPrestamo.dueDate }}</p>
+                            <p class="mb-1"><strong>Fecha limite de entrega:</strong> {{ nuevoPrestamo.returnDate }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal" aria-label="Cerrar"
+                    (click)="onReceiveBook(nuevoPrestamo.bookCopyId ?? 0)"
+                >
+                    Recibir Libro
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="spinner-container" class="spinner-overlay" role="status" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+</div>

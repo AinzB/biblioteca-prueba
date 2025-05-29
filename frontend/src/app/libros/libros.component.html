@@ -1,0 +1,303 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+    <div class="mb-2 mb-md-0 appHeaderTitle">
+        <h2 class="mb-0">Gestión de Libros</h2>
+        <p class="mb-0">{{ libros.length }} libros encontrados</p>
+    </div>
+
+    <div class="input-group w-100 w-md-auto" style="max-width: 20rem">
+        <input type="text" class="form-control" placeholder="Buscar libro por titulo..." aria-label="Buscar libro"
+            [(ngModel)]="nameSearchFilter" (keyup.enter)="getByName()" />
+        <span class="input-group-text" role="button" (click)="getByName()">
+            <i class="bi bi-search"></i>
+        </span>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal"
+        (click)="setUpdateFalse()">
+        Agregar <i class="bi bi-plus ms-1"></i>
+    </button>
+</div>
+
+<div class="container my-4 contentTable">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let libro of libros">
+            <div class="card book-card">
+                <img src="{{ libro.imageUrl }}" class="card-img-top book-cover" alt="Portada del libro" />
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ libro.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ libro.authorName }}</h6>
+                    <p class="card-text mb-4">{{ libro.publisherName }}</p>
+                    <div class="btn-group-vertical gap-2 mt-auto">
+                        <button class="btn btn-success btn-sm" (click)="handleSelectedBookForCopy(libro)"
+                            data-bs-toggle="modal" data-bs-target="#addCopyBook">
+                            <i class="bi bi-plus-lg"></i>
+                            Agregar existencias
+                        </button>
+                        <button class="btn btn-primary btn-sm" (click)="preparaEditar(libro)" data-bs-toggle="modal"
+                            data-bs-target="#newModal">
+                            <i class="bi bi-pencil"></i>
+                            Editar
+                        </button>
+                        <button class="btn btn-info btn-sm text-white" (click)="getCountByBookAndPublisherId(libro)"
+                            data-bs-toggle="modal" data-bs-target="#bookDetailModal">
+                            <i class="bi bi-eye"></i>
+                            Consultar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="newModalLabel">{{ onUpdate ? 'Actualizar Libro' : 'Nuevo Libro' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form #libroForm="ngForm">
+                    <div class="mb-3">
+                        <label for="titleInput" class="form-label">Título</label>
+                        <input type="text" id="titleInput" name="title" class="form-control"
+                            placeholder="Escribe el título del libro" required [(ngModel)]="nuevoLibro.title"
+                            #title="ngModel">
+                        <div class="text-danger" *ngIf="title.invalid && title.touched">
+                            El título es obligatorio.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label for="isbnInput" class="form-label">ISBN</label>
+                                <input type="text" id="isbnInput" name="isbn" class="form-control"
+                                    placeholder="Escribe el ISBN" required [(ngModel)]="nuevoLibro.isbn"
+                                    #isbn="ngModel">
+                                <div class="text-danger" *ngIf="isbn.invalid && isbn.touched">
+                                    El ISBN es obligatorio.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="mb-3">
+                                <label for="yearInput" class="form-label">Año de publicación</label>
+                                <input type="number" id="yearInput" name="publicationYear" class="form-control"
+                                    placeholder="Escribe el año (solo números)" required min="1500"
+                                    [(ngModel)]="nuevoLibro.publicationYear" #year="ngModel">
+                                <div class="text-danger" *ngIf="year.invalid && year.touched">
+                                    Ingresa un año válido.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="categorySelect" class="form-label">Categoría</label>
+                        <select id="categorySelect" name="category" class="form-select" required
+                            [(ngModel)]="nuevoLibro.category" #category="ngModel">
+                            <option value="" disabled selected>Selecciona categoría</option>
+                            <option *ngFor="let cat of librosCategories" [value]="cat">{{ cat }}</option>
+                        </select>
+                        <div class="text-danger" *ngIf="category.invalid && category.touched">
+                            La categoría es obligatoria.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="authorSelect" class="form-label">Autor</label>
+                        <select id="authorSelect" name="authorId" class="form-select" required
+                            [(ngModel)]="nuevoLibro.authorId" #author="ngModel">
+                            <option value="" disabled selected>Selecciona autor</option>
+                            <option *ngFor="let a of autores" [value]="a.id">
+                                {{ a.name }}
+                            </option>
+                        </select>
+                        <div class="text-danger" *ngIf="author.invalid && author.touched">
+                            Debes seleccionar un autor.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="publisherSelect" class="form-label">Editorial</label>
+                        <select id="publisherSelect" name="publisherId" class="form-select" required
+                            [(ngModel)]="nuevoLibro.publisherId" #publisher="ngModel">
+                            <option value="" disabled selected>Selecciona editorial</option>
+                            <option *ngFor="let ed of publishers" [value]="ed.id">{{ ed.name }}</option>
+                        </select>
+                        <div class="text-danger" *ngIf="publisher.invalid && publisher.touched">
+                            Debes seleccionar una editorial.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="imageInput" class="form-label">Portada del libro</label>
+                        <input type="file" id="imageInput" name="image" class="form-control" accept="image/*"
+                            (change)="onFileSelected($event)">
+                    </div>
+                </form>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="preSave()" data-bs-dismiss="modal">
+                    {{ onUpdate ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCopyBook" tabindex="-1" aria-labelledby="addCopyBookLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCopyBookLabel">Registrar Existencias</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form #copyForm="ngForm">
+                    <div class="mb-3">
+                        <label for="bookTitleInput" class="form-label">Libro</label>
+                        <input type="text" id="bookTitleInput" name="bookTitle" class="form-control"
+                            [(ngModel)]="nuevaCopiaLibro.bookTitle" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="publisherNameInput" class="form-label">Editorial</label>
+                        <input type="text" id="publisherNameInput" name="publisherName" class="form-control"
+                            [(ngModel)]="nuevaCopiaLibro.publisherName" disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="statusSelect" class="form-label">Estado</label>
+                        <select id="statusSelect" name="status" class="form-select" required
+                            [(ngModel)]="nuevaCopiaLibro.status" #status="ngModel">
+                            <option value="" disabled selected>Selecciona estado</option>
+                            <option value="DISPONIBLE">DISPONIBLE</option>
+                            <option value="PRESTADO">PRESTADO</option>
+                            <option value="PERDIDO">PERDIDO</option>
+                        </select>
+                        <div class="text-danger" *ngIf="status.invalid && status.touched">
+                            El estado es obligatorio.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="conditionSelect" class="form-label">Condición</label>
+                        <select id="conditionSelect" name="condition" class="form-select" required
+                            [(ngModel)]="nuevaCopiaLibro.condition" #condition="ngModel">
+                            <option value="" disabled selected>Selecciona condición</option>
+                            <option value="EXCELENTE">EXCELENTE</option>
+                            <option value="BUENA">BUENA</option>
+                            <option value="MALA">MALA</option>
+                        </select>
+                        <div class="text-danger" *ngIf="condition.invalid && condition.touched">
+                            La condición es obligatoria.
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarCopia()" data-bs-dismiss="modal">
+                    Guardar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="spinner-container" class="spinner-overlay" role="status" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookDetailLabel">Detalle del Libro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
+                    (click)="limCamp()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- Imagen 40% -->
+                        <div class="col-12 col-md-5 d-flex justify-content-center mb-3 mb-md-0">
+                            <img src="{{ nuevoLibro.imageUrl }}" alt="Portada vertical" class="img-fluid"
+                                style="max-height: 400px; object-fit: cover;">
+                        </div>
+                        <!-- Información 60% -->
+                        <div class="col-12 col-md-7">
+                            <h3 class="mt-0">{{ nuevoLibro.title }}</h3>
+                            <p class="mb-1"><strong>ISBN:</strong> {{ nuevoLibro.isbn }}</p>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;"><strong>Autor:</strong> {{
+                                nuevoLibro.authorName }}</p>
+                            <p class="mb-1"><strong>Editorial:</strong> {{ nuevoLibro.publisherName }}</p>
+                            <p class="mb-3">
+                                <span class="badge bg-secondary rounded-pill">{{ nuevoLibro.category }}</span>
+                            </p>
+                            <p class="mb-1"><strong>Año:</strong> {{ nuevoLibro.publicationYear }}</p>
+                            <p class="mb-1"><strong>COPIAS:</strong></p>
+                            <p class="mb-1"><strong>Excelentes:</strong> {{ nuevoLibro.countExcelente }}</p>
+                            <p class="mb-1"><strong>Buenas:</strong> {{ nuevoLibro.countBuena }}</p>
+                            <p class="mb-1"><strong>Malas:</strong> {{ nuevoLibro.countMala }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Sección Libros Prestados -->
+                    <div class="mt-4">
+                        <h5>Libros Prestados</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Editorial</th>
+                                        <th>Estado</th>
+                                        <th>Estudiante</th>
+                                        <th>Fecha de entrega</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let prestamo of prestamos">
+                                        <td>{{ prestamo.bookTitle }}</td>
+                                        <td>{{ prestamo.publisherName }}</td>
+                                        <td>{{ prestamo.condition }}</td>
+                                        <td>{{ prestamo.studentName }}</td>
+                                        <td>{{ prestamo.loanDate | date:'shortDate' }}</td>
+                                    </tr>
+                                </tbody>
+
+                            </table> 
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

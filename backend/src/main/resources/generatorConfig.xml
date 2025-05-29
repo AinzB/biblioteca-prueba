@@ -1,0 +1,74 @@
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+  <context id="OracleContext" targetRuntime="MyBatis3">
+    <!-- 1. Conexión JDBC -->
+    <jdbcConnection
+        driverClass="oracle.jdbc.OracleDriver"
+        connectionURL="jdbc:oracle:thin:@localhost:1521/FREEPDB1"
+        userId="appadmin"
+        password="secret"/>
+
+    <!-- 2. Generadores -->
+    <javaModelGenerator
+        targetPackage="com.rockettest.biblioetca.model"
+        targetProject="src/main/java"/>
+    <sqlMapGenerator
+        targetPackage="mapper"
+        targetProject="src/main/resources"/>
+    <javaClientGenerator
+        type="XMLMAPPER"
+        targetPackage="com.rockettest.biblioetca.mapper"
+        targetProject="src/main/java"/>
+
+    <!-- 3. Tablas con secuencia y selectKey pre-insert -->
+    <table tableName="publishers" domainObjectName="Publisher" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT PUBLISHER_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+
+    <table tableName="authors" domainObjectName="Author" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT AUTHOR_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+
+    <table tableName="books" domainObjectName="Book" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT BOOK_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+
+    <table tableName="students" domainObjectName="Student" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT STUDENT_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+
+    <table tableName="book_copies" domainObjectName="BookCopy" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT BOOK_COPY_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+
+    <table tableName="book_loans" domainObjectName="BookLoan" enableInsert="true">
+      <generatedKey
+          column="ID"
+          sqlStatement="SELECT BOOK_LOAN_SEQ.nextval FROM DUAL"
+          identity="false"
+          type="pre"/>
+    </table>
+  </context>
+</generatorConfiguration>

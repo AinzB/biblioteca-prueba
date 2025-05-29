@@ -1,0 +1,59 @@
+@use 'variables';
+
+.mainHeader {
+    height: 5rem;
+
+    img {
+        height: 90%;
+    }
+}
+
+.offCanvasHeader {
+    margin-top: 2rem;
+    padding: 0 2rem;
+
+    .offCanvasTitle {
+        font-size: 2rem;
+        color: variables.$gray;
+    }
+}
+
+.menuLink {
+    cursor: pointer;
+    width: 10rem;
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+    color: variables.$gray;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    margin-left: 2rem;
+    transition: all 0.5s ease-in-out;
+}
+
+.menuLink:hover {
+    background-color: variables.$primary-background;
+    color: variables.$white;
+    box-shadow: 5px 5px 10px variables.$gray;
+}
+
+.menuActive {
+    background-color: variables.$primary-background;
+    color: variables.$white;
+    box-shadow: 5px 5px 10px variables.$gray;
+}
+
+.mainContainer {
+    width: 100%;
+    height: calc(100vh - 5rem);
+    overflow: hidden;
+    padding: 1rem;
+    
+    .appContainer {
+        background-color: variables.$light-gray;
+        width: 100%;
+        height: 100%;
+        border-radius: 2rem;
+        padding: 2rem;
+    }
+}

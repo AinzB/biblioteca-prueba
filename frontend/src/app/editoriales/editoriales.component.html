@@ -1,0 +1,159 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+    <div class="mb-2 mb-md-0 appHeaderTitle">
+        <h2 class="mb-0">Gestión de Editoriales</h2>
+        <p class="mb-0">{{ editoriales.length }} editoriales encontradas</p>
+    </div>
+
+    <div class="input-group w-100 w-md-auto" style="max-width: 20rem;">
+        <input
+            type="text"
+            class="form-control"
+            placeholder="Buscar editorial..."
+            aria-label="Buscar editorial"
+            [(ngModel)]="nameSearchFilter"
+            (keyup.enter)="getByName()"
+        >
+        <span class="input-group-text" role="button" (click)="getByName()">
+            <i class="bi bi-search"></i>
+        </span>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal" (click)="setUpdateFalse()">
+        Agregar <i class="bi bi-plus ms-1"></i>
+    </button>
+</div>
+
+<div class="table-responsive contentTable">
+    <table class="table table-hover mb-0">
+        <colgroup>
+            <col style="width: 5%;">
+            <col style="width: 20%;">  <!-- name --> 
+            <col style="width: 15%;"> <!-- phone --> 
+            <col style="width: 10%;"> <!-- email --> 
+            <col style="width: 30%;"> <!-- Dir --> 
+            <col style="width: 20%;"> <!-- Date --> 
+        </colgroup>
+
+        <thead class="sticky-top bg-light">
+            <tr class="align-top">
+                <th class="text-center"></th>
+                <th>Nombre</th>
+                <th>Número</th>
+                <th>Correo</th>
+                <th>Dirección</th>
+                <th>Fecha Creación</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let editorial of editoriales">
+                <td class="text-center align-top">
+                    <button class="btn btn-link p-0" (click)="preparaEditar(editorial)" data-bs-toggle="modal" data-bs-target="#newModal">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                </td>
+                <td class="align-top">{{ editorial.name }}</td>
+                <td class="align-top">{{ editorial.phone }}</td>
+                <td class="align-top">{{ editorial.email }}</td>
+                <td class="align-top">{{ editorial.address }}</td>
+                <td class="align-top">{{ editorial.createdAt| date:'shortDate' }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="newModalLabel">{{ onUpdate ? 'Actualizar Editorial' : 'Nueva Editorial' }}</h5>
+                <button 
+                type="button" 
+                class="btn-close" 
+                data-bs-dismiss="modal" 
+                aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form #autorForm="ngForm">
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label">Nombre</label>
+                        <input
+                            type="text"
+                            id="nameInput"
+                            name="name"
+                            class="form-control"
+                            placeholder="Escribe el nombre"
+                            required="true"
+                            [(ngModel)]="nuevaEditorial.name"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phoneInput" class="form-label">Teléfono</label>
+                        <input
+                            type="tel"
+                            id="phoneInput"
+                            name="phone"
+                            class="form-control"
+                            placeholder="Escribe el teléfono"
+                            [(ngModel)]="nuevaEditorial.phone"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Correo electrónico</label>
+                        <input
+                            type="email"
+                            id="emailInput"
+                            name="email"
+                            class="form-control"
+                            placeholder="Escribe el correo electrónico"
+                            [(ngModel)]="nuevaEditorial.email"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addressInput" class="form-label">Dirección</label>
+                        <input
+                            type="text"
+                            id="addressInput"
+                            name="address"
+                            class="form-control"
+                            placeholder="Escribe la dirección"
+                            [(ngModel)]="nuevaEditorial.address"
+                        >
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button 
+                    type="button" 
+                    class="btn btn-secondary" 
+                    data-bs-dismiss="modal"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary"
+                    (click)="preSave()"
+                    data-bs-dismiss="modal"
+                    >
+                    {{ onUpdate ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="spinner-container" class="spinner-overlay" role="status" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+</div>
